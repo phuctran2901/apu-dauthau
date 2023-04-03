@@ -10,8 +10,8 @@ import { CookieJar } from 'tough-cookie'
 const jar = new CookieJar()
 
 const call = axios.create({
-  baseURL: BASE_URL,
-  jar
+  baseURL: BASE_URL
+  // jar
 })
 
 function convertURLFromTypeInfo(typeInfo) {
