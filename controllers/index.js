@@ -81,117 +81,123 @@ class AppControllers {
     const type2 = req.query.type_info2
     const type3 = req.query.type_info3
     const typeSearch = req.query.type_search
-    let url = `/${convertURLFromTypeInfo(type)}/?${serialize(req.query)}`
+    let url = `/${convertURLFromTypeInfo(type)}/${
+      serialize(req.query).length > 0 ? '?' : ''
+    }${serialize(req.query)}`
     if (Number(typeSearch) === 2) {
-      url = `/${convertURLFromTypeInfo2(type2)}/?${serialize(req.query)}`
+      url = `/${convertURLFromTypeInfo2(type2)}/${
+        serialize(req.query).length > 0 ? '?' : ''
+      }${serialize(req.query)}`
     }
     if (Number(typeSearch) === 3) {
-      url = `/${convertURLFromTypeInfo3(type3)}/?${serialize(req.query)}`
+      url = `/${convertURLFromTypeInfo3(type3)}/${
+        serialize(req.query).length > 0 ? '?' : ''
+      }${serialize(req.query)}`
     }
+    // res.json({ url })
+    const { data } = await client.get(url)
     console.log(url)
-    res.json({ url })
-    // const { data } = await client.get(url)
-    // try {
-    //   const $ = cheerio.load(data)
-    //   const listItem = $('.bidding-table tbody tr')
-    //     .toArray()
-    //     .map((td) => {
-    //       const html = $(td)
-    //       const wrapperTitle = $(html.find('.order-header'))
-    //       // const titleCode = wrapperTitle.find('.bidding-code').text()
-    //       const titleText = wrapperTitle.find('a').attr('title')
-    //       const titleTextResult = $(html.find('.order-header > div'))
-    //         .clone()
-    //         .children()
-    //         .remove()
-    //         .end()
-    //         .text()
-    //       const titleLink = wrapperTitle.find('a').attr('href')
-    //       const bidSolicitorWrapperTitle = wrapperTitle.next()
-    //       const solicitorCode = bidSolicitorWrapperTitle
-    //         .find('.solicitor-code')
-    //         .text()
-    //       const titleBidSolici = $(bidSolicitorWrapperTitle.find('a')).attr(
-    //         'title'
-    //       )
-    //       const linkBidSolici = $(bidSolicitorWrapperTitle.find('a')).attr(
-    //         'href'
-    //       )
-    //       const DMDA = $(html.find('[data-column="Đơn vị công bố DMDA"]'))
-    //       const typeProject = $(html.find('[data-column="Loại dự án"]'))
-    //       const nameAsset = $(html.find('[data-column="Tên tài sản"]')).find(
-    //         'div a'
-    //       )
-    //       const assetBy = $(html.find('[data-column="Tài sản của"]')).text()
-    //       const nameProject = $(html.find('[data-column="Tên dự án"]'))
-    //         .find('div')
-    //         .clone()
-    //         .children()
-    //         .remove()
-    //         .end()
-    //       const publicTime = $(html.find('.txt-center').first())
-    //       const expired = $(publicTime).next()
-    //       const packageAmount = $(publicTime).next()
-    //       const KHLCNT = $(html.find('[data-column="KHLCNT"]'))
-    //         .text()
-    //         .replaceAll('\n', '')
-    //       const wonBid = $(html.find('[data-column="Nhà thầu trúng thầu"]'))
+    try {
+      const $ = cheerio.load(data)
+      const listItem = $('.bidding-table tbody tr')
+        .toArray()
+        .map((td) => {
+          const html = $(td)
+          const wrapperTitle = $(html.find('.order-header'))
+          // const titleCode = wrapperTitle.find('.bidding-code').text()
+          const titleText = wrapperTitle.find('a').attr('title')
+          const titleTextResult = $(html.find('.order-header > div'))
+            .clone()
+            .children()
+            .remove()
+            .end()
+            .text()
+          const titleLink = wrapperTitle.find('a').attr('href')
+          const bidSolicitorWrapperTitle = wrapperTitle.next()
+          const solicitorCode = bidSolicitorWrapperTitle
+            .find('.solicitor-code')
+            .text()
+          const titleBidSolici = $(bidSolicitorWrapperTitle.find('a')).attr(
+            'title'
+          )
+          const linkBidSolici = $(bidSolicitorWrapperTitle.find('a')).attr(
+            'href'
+          )
+          const DMDA = $(html.find('[data-column="Đơn vị công bố DMDA"]'))
+          const typeProject = $(html.find('[data-column="Loại dự án"]'))
+          const nameAsset = $(html.find('[data-column="Tên tài sản"]')).find(
+            'div a'
+          )
+          const assetBy = $(html.find('[data-column="Tài sản của"]')).text()
+          const nameProject = $(html.find('[data-column="Tên dự án"]'))
+            .find('div')
+            .clone()
+            .children()
+            .remove()
+            .end()
+          const publicTime = $(html.find('.txt-center').first())
+          const expired = $(publicTime).next()
+          const packageAmount = $(publicTime).next()
+          const KHLCNT = $(html.find('[data-column="KHLCNT"]'))
+            .text()
+            .replaceAll('\n', '')
+          const wonBid = $(html.find('[data-column="Nhà thầu trúng thầu"]'))
 
-    //       const results = $(html.find('[data-column="Kết quả chọn nhà thầu"]'))
-    //       const listResult = $(html.find('[data-column="Nhà thầu được chọn"]'))
-    //       const listResultUL = listResult
-    //         .find('.list-bidder li')
-    //         .toArray()
-    //         .map((item) => {
-    //           const html = $(item)
-    //             .find('a')
-    //             .clone()
-    //             .children()
-    //             .remove()
-    //             .end()
-    //             .text()
-    //           return html
-    //         })
-    //       return {
-    //         package: {
-    //           title: {
-    //             // code: titleCode,
-    //             text: Number(type) === 3 ? titleTextResult : titleText,
-    //             link: titleLink
-    //           }
-    //         },
-    //         publicTime: publicTime.text(),
-    //         results: `${
-    //           results.text().replace('Xem chi tiết kết quả', '').split('-')[1]
-    //         } </br>${
-    //           results.text().replace('Xem chi tiết kết quả', '').split('-')[2]
-    //         }`,
-    //         nameAsset: nameAsset.text(),
-    //         expired: expired.text(),
-    //         wonBid: wonBid.find('li').text(),
-    //         packageAmount: packageAmount.text(),
-    //         assetBy,
-    //         KHLCNT,
-    //         DMDA: DMDA.text(),
-    //         listResult: listResultUL,
-    //         bidSolicitor: {
-    //           title: titleBidSolici,
-    //           code: solicitorCode,
-    //           link: linkBidSolici
-    //         },
-    //         typeProject: typeProject.text(),
-    //         nameProject: nameProject.text()
-    //       }
-    //     })
-    //   const pagination = $('.pagination li').toArray()
-    //   res.json({
-    //     data: listItem,
-    //     totalCount: listItem.length,
-    //     totalPage: $(pagination[pagination.length - 2]).text()
-    //   })
-    // } catch (err) {
-    //   console.log(err.message)
-    // }
+          const results = $(html.find('[data-column="Kết quả chọn nhà thầu"]'))
+          const listResult = $(html.find('[data-column="Nhà thầu được chọn"]'))
+          const listResultUL = listResult
+            .find('.list-bidder li')
+            .toArray()
+            .map((item) => {
+              const html = $(item)
+                .find('a')
+                .clone()
+                .children()
+                .remove()
+                .end()
+                .text()
+              return html
+            })
+          return {
+            package: {
+              title: {
+                // code: titleCode,
+                text: Number(type) === 3 ? titleTextResult : titleText,
+                link: titleLink
+              }
+            },
+            publicTime: publicTime.text(),
+            results: `${
+              results.text().replace('Xem chi tiết kết quả', '').split('-')[1]
+            } </br>${
+              results.text().replace('Xem chi tiết kết quả', '').split('-')[2]
+            }`,
+            nameAsset: nameAsset.text(),
+            expired: expired.text(),
+            wonBid: wonBid.find('li').text(),
+            packageAmount: packageAmount.text(),
+            assetBy,
+            KHLCNT,
+            DMDA: DMDA.text(),
+            listResult: listResultUL,
+            bidSolicitor: {
+              title: titleBidSolici,
+              code: solicitorCode,
+              link: linkBidSolici
+            },
+            typeProject: typeProject.text(),
+            nameProject: nameProject.text()
+          }
+        })
+      const pagination = $('.pagination li').toArray()
+      res.json({
+        data: listItem,
+        totalCount: listItem.length,
+        totalPage: $(pagination[pagination.length - 2]).text()
+      })
+    } catch (err) {
+      console.log(err.message)
+    }
   }
 
   static async getDetail(req, res) {
