@@ -196,7 +196,9 @@ class AppControllers {
         totalPage: $(pagination[pagination.length - 2]).text()
       })
     } catch (err) {
-      console.log(err.message)
+      res.json({
+        err
+      })
     }
   }
 
